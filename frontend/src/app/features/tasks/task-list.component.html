@@ -1,0 +1,94 @@
+<section class="todo-card" aria-labelledby="page-title">
+  <header class="page-header">
+    <p class="eyebrow">YOUR DAY, IN FOCUS</p>
+    <h1 id="page-title">Things to do<span>.</span></h1>
+    <p class="subtitle">A little progress adds up. What’s on your list?</p>
+  </header>
+
+  <form class="task-form" (ngSubmit)="addTask()">
+    <label class="sr-only" for="task-title">Task title</label>
+    <input
+      id="task-title"
+      name="title"
+      type="text"
+      placeholder="Add a task..."
+      [ngModel]="title()"
+      (ngModelChange)="title.set($event)"
+      maxlength="200"
+      required
+    />
+    <label class="sr-only" for="task-description">Optional task details</label>
+    <input
+      id="task-description"
+      class="description-input"
+      name="description"
+      type="text"
+      placeholder="Add a note (optional)"
+      [ngModel]="description()"
+      (ngModelChange)="description.set($event)"
+      maxlength="1000"
+    />
+    <button class="add-button" type="submit" [disabled]="!title().trim() || saving()">
+      {{ saving() ? 'Adding…' : 'Add task' }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" class="retry-button" (click)="loadTasks()">Retry</button>
+    </div>
+  }
+
+  <div class="list-heading">
+    <h2>My tasks</h2>
+    <span class="task-count">{{ remainingCount() }} left</span>
+  </div>
+
+  <nav class="filters" aria-label="Filter tasks">
+    <button type="button" [class.selected]="filter() === 'all'" (click)="setFilter('all')">All</button>
+    <button type="button" [class.selected]="filter() === 'active'" (click)="setFilter('active')">Active</button>
+    <button type="button" [class.selected]="filter() === 'completed'" (click)="setFilter('completed')">
+      Completed
+    </button>
+  </nav>
+
+  @if (loading()) {
+    <p class="empty-state">Loading your tasks…</p>
+  } @else if (visibleTasks().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon" aria-hidden="true">✦</span>
+      <p>{{ tasks().length === 0 ? 'Your list is clear. Add your first task above.' : 'No tasks in this view.' }}</p>
+    </div>
+  } @else {
+    <ul class="task-list">
+      @for (task of visibleTasks(); track task.id) {
+        <li class="task-row" [class.is-complete]="task.completed">
+          <button
+            type="button"
+            class="check-button"
+            [attr.aria-label]="task.completed ? 'Mark ' + task.title + ' as active' : 'Complete ' + task.title"
+            [attr.aria-pressed]="task.completed"
+            (click)="toggleTask(task)"
+          >
+            @if (task.completed) { <span aria-hidden="true">✓</span> }
+          </button>
+          <div class="task-content">
+            <span class="task-title">{{ task.title }}</span>
+            @if (task.description) {
+              <span class="task-description">{{ task.description }}</span>
+            }
+          </div>
+          <button
+            type="button"
+            class="delete-button"
+            [attr.aria-label]="'Delete ' + task.title"
+            (click)="deleteTask(task)"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>

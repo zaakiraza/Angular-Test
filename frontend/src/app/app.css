@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 64px 24px;
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    padding: 36px 16px;
+  }
+}
